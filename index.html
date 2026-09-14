@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>辽陕区域知识库 · 检索中心</title>
+<style>
+  :root{
+    --bg:#f5f6f8; --card:#fff; --line:#e3e6ea; --ink:#1f2329; --sub:#6b7280;
+    --brand:#2f6fed; --brand-soft:#eaf1ff; --tag:#eef2f7; --shadow:0 1px 3px rgba(0,0,0,.08);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+       background:var(--bg);color:var(--ink);font-size:15px;line-height:1.6}
+  header{background:linear-gradient(120deg,#2f6fed,#5b8def);color:#fff;padding:22px 24px}
+  header h1{margin:0;font-size:20px;font-weight:700}
+  header .sub{margin:6px 0 0;font-size:13px;opacity:.92}
+  .wrap{max-width:900px;margin:0 auto;padding:18px 16px 60px}
+  .bar{display:flex;align-items:center;gap:10px;margin:18px 0 10px}
+  .bar input{flex:1;padding:13px 16px;border:1px solid var(--line);border-radius:10px;font-size:15px;background:var(--card);outline:none}
+  .bar input:focus{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
+  .bar .cnt{font-size:12px;color:var(--sub);white-space:nowrap}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 14px}
+  .chips button{border:1px solid var(--line);background:var(--card);color:var(--sub);
+    padding:6px 14px;border-radius:999px;cursor:pointer;font-size:13px}
+  .chips button.active{background:var(--brand);color:#fff;border-color:var(--brand)}
+  .answer{background:var(--brand-soft);border:1px solid #cfe0ff;border-radius:10px;
+    padding:14px 16px;margin-bottom:16px;white-space:pre-wrap;font-size:14px;color:#173a73}
+  .answer.hidden{display:none}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:10px;
+    box-shadow:var(--shadow);cursor:pointer;transition:border-color .15s}
+  .card:hover{border-color:var(--brand)}
+  .card .top{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+  .badge{font-size:12px;padding:2px 9px;border-radius:6px;background:var(--brand-soft);color:#1d4ed8;font-weight:600}
+  .badge.b2{background:#eafaf0;color:#1a7f4b}
+  .badge.b3{background:#fff4e6;color:#b45309}
+  .card h3{margin:0;font-size:16px;font-weight:600}
+  .card .sum{color:var(--sub);font-size:13px;margin:6px 0 0}
+  .tags{margin-top:8px;display:flex;gap:6px;flex-wrap:wrap}
+  .tags span{font-size:12px;background:var(--tag);color:#475569;padding:2px 8px;border-radius:6px}
+  .empty{text-align:center;color:var(--sub);padding:40px 0}
+  .mask{position:fixed;inset:0;background:rgba(15,23,42,.45);display:none;align-items:flex-start;justify-content:center;
+    padding:40px 16px;overflow:auto;z-index:50}
+  .mask.show{display:flex}
+  .modal{background:#fff;border-radius:14px;max-width:760px;width:100%;padding:24px 26px;box-shadow:0 10px 40px rgba(0,0,0,.25)}
+  .modal h2{margin:0 0 4px;font-size:20px}
+  .modal .meta{color:var(--sub);font-size:13px;margin-bottom:14px}
+  .modal .body{font-size:14px}
+  .modal .body h1,.modal .body h2,.modal .body h3{margin:18px 0 8px}
+  .modal .body table{border-collapse:collapse;width:100%;margin:10px 0;font-size:13px}
+  .modal .body th,.modal .body td{border:1px solid var(--line);padding:6px 8px;text-align:left}
+  .modal .body code{background:#f1f3f5;padding:1px 5px;border-radius:4px}
+  .modal .body pre{background:#0f172a;color:#e2e8f0;padding:12px;border-radius:8px;overflow:auto}
+  .modal .files{margin-top:14px;padding-top:12px;border-top:1px dashed var(--line)}
+  .modal .files a{display:inline-block;margin:0 8px 8px 0;padding:6px 12px;background:var(--brand-soft);
+    color:#1d4ed8;border-radius:8px;text-decoration:none;font-size:13px}
+  .modal .close{float:right;border:none;background:none;font-size:22px;cursor:pointer;color:var(--sub);line-height:1}
+  footer{max-width:900px;margin:24px auto 0;padding:0 16px;color:var(--sub);font-size:12px;text-align:center}
+  footer code{background:#eef2f7;padding:1px 5px;border-radius:4px}
+</style>
+</head>
+<body>
+<header>
+  <h1>辽陕区域知识库 · 检索中心</h1>
+  <p class="sub">政策发文 · 活动SOP · 问题对策。新人遇卡点，直接把问题打出来搜。（纯静态站，可部署到 GitHub Pages）</p>
+</header>
+
+<div class="wrap">
+  <div class="bar">
+    <input id="q" placeholder="例如：学校不配合打卡怎么办？整本书阅读启动会怎么开？平台海选卡顿怎么处理？" />
+    <span class="cnt" id="cnt"></span>
+  </div>
+  <div class="chips" id="chips">
+    <button data-cat="" class="active">全部</button>
+    <button data-cat="区域发文">区域发文</button>
+    <button data-cat="活动SOP">活动SOP</button>
+    <button data-cat="问题对策">问题对策</button>
+  </div>
+
+  <div class="answer hidden" id="answer"></div>
+  <div id="list"></div>
+</div>
+
+<div class="mask" id="mask">
+  <div class="modal">
+    <button class="close" id="closeBtn">×</button>
+    <h2 id="mTitle"></h2>
+    <div class="meta" id="mMeta"></div>
+    <div class="body" id="mBody"></div>
+    <div class="files" id="mFiles"></div>
+  </div>
+</div>
+
+<footer>
+  纯静态部署版：直接读取 <code>./data.json</code>，无需后端。新增条目运行 <code>python build.py</code> 后重新提交 data.json 即可。
+</footer>
+
+<script>
+const $ = s => document.querySelector(s);
+let DATA = {categories:[], entries:[]};
+let curCat = "";
+let timer = null;
+
+function esc(s){return (s==null?"":String(s)).replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[m]));}
+function badgeClass(cat){
+  if(cat==="区域发文") return "";
+  if(cat==="活动SOP") return "b2";
+  return "b3";
+}
+
+// —— 本地检索（复刻 app.py 的 tokenize / score / search / answer）——
+function tokenize(q){
+  q = q.toLowerCase();
+  const toks = [];
+  const en = q.match(/[a-z0-9]+/g);
+  if(en) toks.push(...en);
+  const cn = q.replace(/[a-z0-9\s]/g, '');
+  for(let i=0;i<cn.length;i++){
+    toks.push(cn[i]);
+    if(i < cn.length-1) toks.push(cn.slice(i, i+2));
+  }
+  return toks;
+}
+function countOcc(str, t){ return str.split(t).length - 1; }
+function scoreEntry(e, tokens){
+  const text = (e.text||"").toLowerCase();
+  const title = (e.title||"").toLowerCase();
+  const tags = (e.tags||[]).join(" ").toLowerCase();
+  let s = 0;
+  for(const t of tokens){
+    if(!t) continue;
+    s += countOcc(text, t);
+    if(title.includes(t)) s += 5;
+    if(tags.includes(t)) s += 3;
+  }
+  return s;
+}
+function search(q, cat, limit){
+  const tokens = tokenize(q);
+  if(!tokens.length) return [];
+  const res = [];
+  for(const e of DATA.entries){
+    if(cat && e.category !== cat) continue;
+    const s = scoreEntry(e, tokens);
+    if(s > 0) res.push([s, e]);
+  }
+  res.sort((a,b)=> b[0]-a[0]);
+  return res.slice(0, limit||20).map(x=>x[1]);
+}
+function answer(q, cat){
+  const results = search(q, cat, 5);
+  if(!results.length){
+    return "知识库里暂时没有和这个问题直接相关的条目。\n建议：① 换关键词再问一次；② 把这个问题 + 你们团队摸索出的解决经验告诉我（知行），我帮你沉淀成一条目，下次新人就能直接查到。";
+  }
+  const lines = [`知识库中与「${q}」相关的条目如下（共 ${results.length} 条），建议优先看靠前几条：`];
+  results.forEach((e,i)=>{
+    const tagstr = (e.tags&&e.tags.length)?e.tags.join("、"):"—";
+    lines.push(`${i+1}. 【${e.category}】${e.title}（标签：${tagstr}）`);
+  });
+  lines.push("\n点开任一卡片可看完整对策 / SOP / 政策要点。");
+  return lines.join("\n");
+}
+
+function renderList(entries){
+  const list = $("#list");
+  if(!entries.length){
+    list.innerHTML = `<div class="empty">没有匹配的条目。换个关键词，或把这个问题 + 解决经验交给知行沉淀成一条目。</div>`;
+    return;
+  }
+  list.innerHTML = entries.map(e=>{
+    const tags = (e.tags||[]).map(t=>`<span>${esc(t)}</span>`).join("");
+    return `<div class="card" data-id="${encodeURIComponent(e.id)}">
+      <div class="top"><span class="badge ${badgeClass(e.category)}">${esc(e.category)}</span>
+      <h3>${esc(e.title)}</h3></div>
+      ${e.summary?`<div class="sum">${esc(e.summary)}</div>`:""}
+      ${tags?`<div class="tags">${tags}</div>`:""}
+    </div>`;
+  }).join("");
+  list.querySelectorAll(".card").forEach(c=>{
+    c.addEventListener("click", ()=>openEntry(decodeURIComponent(c.dataset.id)));
+  });
+}
+
+async function refresh(){
+  const q = $("#q").value.trim();
+  let entries;
+  if(q){
+    entries = search(q, curCat, 20);
+    const ansBox = $("#answer");
+    ansBox.textContent = answer(q, curCat);
+    ansBox.classList.remove("hidden");
+  }else{
+    entries = DATA.entries.filter(e=> !curCat || e.category===curCat);
+    $("#answer").classList.add("hidden");
+  }
+  renderList(entries);
+  $("#cnt").textContent = entries.length + " 条";
+}
+
+function onInput(){
+  clearTimeout(timer);
+  timer = setTimeout(refresh, 200);
+}
+
+function openEntry(id){
+  const e = DATA.entries.find(x=>x.id===id);
+  if(!e) return;
+  $("#mTitle").textContent = e.title||"";
+  $("#mMeta").textContent = (e.category||"") + (e.tags&&e.tags.length?(" · 标签："+e.tags.join("、")):"");
+  $("#mBody").innerHTML = e.html||"";
+  const filesBox = $("#mFiles");
+  if(e.files && e.files.length){
+    filesBox.innerHTML = "<strong>附件：</strong><br>" + e.files.map(f=>{
+      if(f.approved && !f.missing) return `<a href="./files/${esc(f.name)}" target="_blank">${esc(f.name)}</a>`;
+      if(f.missing) return `<span style="color:#b45309">${esc(f.name)}（缺失）</span>`;
+      return `<span style="color:#6b7280">${esc(f.name)}（未开放下载）</span>`;
+    }).join("");
+  }else{
+    filesBox.innerHTML = "";
+  }
+  $("#mask").classList.add("show");
+}
+function closeModal(){$("#mask").classList.remove("show");}
+
+$("#q").addEventListener("input", onInput);
+$("#chips").addEventListener("click", e=>{
+  if(e.target.tagName!=="BUTTON") return;
+  document.querySelectorAll("#chips button").forEach(b=>b.classList.remove("active"));
+  e.target.classList.add("active");
+  curCat = e.target.dataset.cat;
+  refresh();
+});
+$("#closeBtn").addEventListener("click", closeModal);
+$("#mask").addEventListener("click", e=>{if(e.target.id==="mask") closeModal();});
+document.addEventListener("keydown", e=>{if(e.key==="Escape") closeModal();});
+
+// 初始加载：读取本地 data.json
+(async function(){
+  try{
+    const r = await fetch("./data.json");
+    DATA = await r.json();
+  }catch(err){
+    $("#list").innerHTML = `<div class="empty">加载 data.json 失败，请确认 data.json 与本页面在同一目录。</div>`;
+    return;
+  }
+  refresh();
+})();
+</script>
+</body>
+</html>

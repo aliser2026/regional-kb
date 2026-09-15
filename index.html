@@ -34,6 +34,7 @@
   .badge{font-size:12px;padding:2px 9px;border-radius:6px;background:var(--brand-soft);color:#1d4ed8;font-weight:600}
   .badge.b2{background:#eafaf0;color:#1a7f4b}
   .badge.b3{background:#fff4e6;color:#b45309}
+  .badge.b4{background:#f3e8ff;color:#7c3aed}
   .card h3{margin:0;font-size:16px;font-weight:600}
   .card .sum{color:var(--sub);font-size:13px;margin:6px 0 0}
   .tags{margin-top:8px;display:flex;gap:6px;flex-wrap:wrap}
@@ -90,7 +91,7 @@
 
 <header>
   <h1>辽陕区域知识库 · 检索中心</h1>
-  <p class="sub">政策发文 · 活动SOP · 问题对策。新人遇卡点，直接把问题打出来搜。（纯静态站，可部署到 GitHub Pages）</p>
+  <p class="sub">政策发文 · 活动SOP · 问题对策 · AI技能。新人遇卡点，直接把问题打出来搜。（纯静态站，可部署到 GitHub Pages）</p>
 </header>
 
 <div class="wrap">
@@ -103,6 +104,7 @@
     <button data-cat="区域发文">区域发文</button>
     <button data-cat="活动SOP">活动SOP</button>
     <button data-cat="问题对策">问题对策</button>
+    <button data-cat="AI技能">AI技能</button>
   </div>
 
   <div class="answer hidden" id="answer"></div>
@@ -134,6 +136,7 @@ function esc(s){return (s==null?"":String(s)).replace(/[&<>"]/g,m=>({"&":"&amp;"
 function badgeClass(cat){
   if(cat==="区域发文") return "";
   if(cat==="活动SOP") return "b2";
+  if(cat==="AI技能") return "b4";
   return "b3";
 }
 

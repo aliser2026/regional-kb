@@ -57,9 +57,37 @@
   .modal .close{float:right;border:none;background:none;font-size:22px;cursor:pointer;color:var(--sub);line-height:1}
   footer{max-width:900px;margin:24px auto 0;padding:0 16px;color:var(--sub);font-size:12px;text-align:center}
   footer code{background:#eef2f7;padding:1px 5px;border-radius:4px}
+  /* —— 口令解锁层 —— */
+  #lock{position:fixed;inset:0;background:linear-gradient(160deg,#eef2f8,#e3ebf7);z-index:100;
+    display:flex;align-items:center;justify-content:center;padding:20px}
+  #lock.hidden{display:none}
+  .lock-card{background:#fff;border-radius:16px;box-shadow:0 12px 40px rgba(15,23,42,.15);
+    padding:36px 32px;max-width:380px;width:100%;text-align:center}
+  .lock-card .ico{font-size:40px;margin-bottom:8px}
+  .lock-card h2{margin:0 0 6px;font-size:20px;color:#1f2329}
+  .lock-card p{margin:0 0 18px;font-size:13px;color:var(--sub)}
+  .lock-card input{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:10px;
+    font-size:15px;outline:none;text-align:center;letter-spacing:1px}
+  .lock-card input:focus{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
+  .lock-card button{width:100%;margin-top:12px;padding:12px;border:none;border-radius:10px;
+    background:var(--brand);color:#fff;font-size:15px;font-weight:600;cursor:pointer}
+  .lock-card button:hover{background:#265fd0}
+  .lock-card .err{margin-top:10px;font-size:13px;color:#dc2626;min-height:18px}
+  .lock-card.loading{color:var(--sub);font-size:13px}
 </style>
 </head>
 <body>
+<div id="lock">
+  <div class="lock-card">
+    <div class="ico">🔐</div>
+    <h2>辽陕区域知识库</h2>
+    <p>内部资料，请输入访问口令解锁</p>
+    <input id="pwd" type="password" placeholder="访问口令" autocomplete="off" />
+    <button id="unlockBtn">解 锁</button>
+    <div class="err" id="lockErr"></div>
+  </div>
+</div>
+
 <header>
   <h1>辽陕区域知识库 · 检索中心</h1>
   <p class="sub">政策发文 · 活动SOP · 问题对策。新人遇卡点，直接把问题打出来搜。（纯静态站，可部署到 GitHub Pages）</p>
@@ -92,9 +120,10 @@
 </div>
 
 <footer>
-  纯静态部署版：直接读取 <code>./data.json</code>，无需后端。新增条目运行 <code>python build.py</code> 后重新提交 data.json 即可。
+  辽陕团队内部知识库 · 内容已加密存储，凭口令访问。新增条目：运行 <code>python build.py</code> → <code>node encrypt_data.js</code> 后提交 data.enc。
 </footer>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 let DATA = {categories:[], entries:[]};
@@ -234,17 +263,65 @@ $("#closeBtn").addEventListener("click", closeModal);
 $("#mask").addEventListener("click", e=>{if(e.target.id==="mask") closeModal();});
 document.addEventListener("keydown", e=>{if(e.key==="Escape") closeModal();});
 
-// 初始加载：读取本地 data.json
-(async function(){
+// —— 口令解锁 + 加密数据加载 ——
+const LOCK_KEY = "kb_pass_cache";
+let encText = null;      // data.enc 原文（首次加载后缓存）
+let unlocked = false;
+
+async function loadEnc(){
+  if(encText) return encText;
+  const r = await fetch("./data.enc");
+  if(!r.ok) throw new Error("data.enc 加载失败(" + r.status + ")");
+  encText = await r.text();
+  return encText;
+}
+
+function tryUnlock(pass){
+  const bytes = CryptoJS.AES.decrypt(encText, pass);
+  const json = bytes.toString(CryptoJS.enc.Utf8);
+  if(!json || json.indexOf("{") !== 0) return false;
+  DATA = JSON.parse(json);
+  unlocked = true;
+  sessionStorage.setItem(LOCK_KEY, pass);
+  $("#lock").classList.add("hidden");
+  refresh();
+  return true;
+}
+
+async function boot(){
+  const errBox = $("#lockErr");
   try{
-    const r = await fetch("./data.json");
-    DATA = await r.json();
+    await loadEnc();
   }catch(err){
-    $("#list").innerHTML = `<div class="empty">加载 data.json 失败，请确认 data.json 与本页面在同一目录。</div>`;
+    $("#lock").querySelector(".lock-card").classList.add("loading");
+    errBox.textContent = "数据加载失败，请刷新重试";
     return;
   }
-  refresh();
-})();
+  // 同一会话已解锁过，直接用缓存口令
+  const cached = sessionStorage.getItem(LOCK_KEY);
+  if(cached && tryUnlock(cached)) return;
+  // 等待用户输入口令
+  const doUnlock = ()=>{
+    const pass = $("#pwd").value;
+    if(!pass) return;
+    try{
+      if(tryUnlock(pass)){
+        errBox.textContent = "";
+      }else{
+        errBox.textContent = "口令不正确，请重新输入";
+        $("#pwd").select();
+      }
+    }catch(e){
+      errBox.textContent = "口令不正确，请重新输入";
+      $("#pwd").select();
+    }
+  };
+  $("#unlockBtn").addEventListener("click", doUnlock);
+  $("#pwd").addEventListener("keydown", e=>{ if(e.key==="Enter") doUnlock(); });
+  $("#pwd").focus();
+}
+boot();
+
 </script>
 </body>
 </html>

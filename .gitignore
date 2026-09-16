@@ -1,2 +1,5 @@
 .DS_Store
 data.json
+# 密钥与明文口令：绝不能提交
+master.key
+passwords.txt

@@ -83,7 +83,7 @@
   <div class="lock-card">
     <div class="ico">🔐</div>
     <h2>辽陕区域知识库</h2>
-    <p>内部资料，请输入访问口令解锁</p>
+    <p>内部资料 · 一人一码，请输入你的专属口令</p>
     <input id="pwd" type="password" placeholder="访问口令" autocomplete="off" />
     <button id="unlockBtn">解 锁</button>
     <div class="err" id="lockErr"></div>
@@ -124,7 +124,7 @@
 </div>
 
 <footer>
-  辽陕团队内部知识库 · 内容已加密存储，凭口令访问。新增条目：运行 <code>python build.py</code> → <code>node encrypt_data.js</code> 后提交 data.enc。
+  辽陕团队内部知识库 · 内容加密存储，<b>一人一码</b>访问，页面已绑定访问者身份与追溯水印。增删人员/换码：<code>node manage_users.js add|remove|reset|list</code>。
 </footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
@@ -269,27 +269,72 @@ $("#closeBtn").addEventListener("click", closeModal);
 $("#mask").addEventListener("click", e=>{if(e.target.id==="mask") closeModal();});
 document.addEventListener("keydown", e=>{if(e.key==="Escape") closeModal();});
 
-// —— 口令解锁 + 加密数据加载 ——
+// —— 一人一码解锁 + 身份识别 + 追溯水印 ——
 const LOCK_KEY = "kb_pass_cache";
-let encText = null;      // data.enc 原文（首次加载后缓存）
+let encText = null;      // data.enc 原文（主密钥加密）
+let usersDb = null;      // users.json（每人一条包裹密钥）
 let unlocked = false;
+let currentUser = null;
 
 async function loadEnc(){
-  if(encText) return encText;
-  const r = await fetch("./data.enc");
-  if(!r.ok) throw new Error("data.enc 加载失败(" + r.status + ")");
-  encText = await r.text();
+  if(encText && usersDb) return encText;
+  const [r1, r2] = await Promise.all([fetch("./data.enc"), fetch("./users.json")]);
+  if(!r1.ok) throw new Error("data.enc 加载失败(" + r1.status + ")");
+  if(!r2.ok) throw new Error("users.json 加载失败(" + r2.status + ")");
+  encText = await r1.text();
+  usersDb = await r2.json();
   return encText;
 }
 
+// 用「个人专属口令」解开被包裹的主密钥，同时识别出访问者是谁
+function resolveUser(pass){
+  for(const u of (usersDb && usersDb.users ? usersDb.users : [])){
+    try{
+      const out = CryptoJS.AES.decrypt(u.wrapped, pass).toString(CryptoJS.enc.Utf8);
+      if(out && out.indexOf("MK1:") === 0) return { mk: out.slice(4), user: u };
+    }catch(e){ /* 不是这个人，继续试下一个 */ }
+  }
+  return null;
+}
+
+function esc(s){
+  return String(s == null ? "" : s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+// 整页覆盖「姓名+小组+时间」水印，截图/拍照可追溯到人
+function showWatermark(u){
+  const stamp = new Date().toLocaleString("zh-CN", { hour12:false });
+  const label = esc((u.name || "") + (u.tag ? "·" + u.tag : "") + " " + stamp);
+  const svg = "<svg xmlns='http://www.w3.org/2000/svg' width='320' height='170'>"
+    + "<text x='12' y='92' transform='rotate(-22 160 85)' fill='%230f172a' "
+    + "font-size='15' font-family='sans-serif' opacity='0.28'>" + label + "</text></svg>";
+  let wm = document.getElementById("wm");
+  if(!wm){ wm = document.createElement("div"); wm.id = "wm"; document.body.appendChild(wm); }
+  wm.style.cssText = "position:fixed;inset:0;z-index:9998;pointer-events:none;"
+    + "background-repeat:repeat;background-image:url(\"data:image/svg+xml;utf8," + svg + "\");";
+
+  let bar = document.getElementById("whoBar");
+  if(!bar){ bar = document.createElement("div"); bar.id = "whoBar"; document.body.appendChild(bar); }
+  bar.innerHTML = "当前访问者：<b>" + esc(u.name) + "</b>"
+    + (u.tag ? "（" + esc(u.tag) + "）" : "") + " · " + esc(stamp)
+    + " · 内容已绑定你的身份，请勿外传";
+  bar.style.cssText = "position:fixed;right:12px;bottom:12px;z-index:9999;"
+    + "background:rgba(15,23,42,.82);color:#fff;font-size:12px;padding:6px 12px;"
+    + "border-radius:20px;pointer-events:none;";
+}
+
 function tryUnlock(pass){
-  const bytes = CryptoJS.AES.decrypt(encText, pass);
+  const r = resolveUser(pass);
+  if(!r) return false;                       // 名单里没有这个人（已被剔除/口令错）
+  const bytes = CryptoJS.AES.decrypt(encText, r.mk);
   const json = bytes.toString(CryptoJS.enc.Utf8);
   if(!json || json.indexOf("{") !== 0) return false;
   DATA = JSON.parse(json);
+  currentUser = r.user;
   unlocked = true;
   sessionStorage.setItem(LOCK_KEY, pass);
   $("#lock").classList.add("hidden");
+  showWatermark(r.user);
   refresh();
   return true;
 }
@@ -314,11 +359,11 @@ async function boot(){
       if(tryUnlock(pass)){
         errBox.textContent = "";
       }else{
-        errBox.textContent = "口令不正确，请重新输入";
+        errBox.textContent = "口令无效，或你已不在访问名单中";
         $("#pwd").select();
       }
     }catch(e){
-      errBox.textContent = "口令不正确，请重新输入";
+      errBox.textContent = "口令无效，或你已不在访问名单中";
       $("#pwd").select();
     }
   };

@@ -1,0 +1,55 @@
+{
+ "version": 1,
+ "users": [
+  {
+   "name": "李范学",
+   "tag": "区域经理",
+   "wrapped": "U2FsdGVkX1+mhY/svJcKIuD6KB2L4kz36Y91E+nPbTdI3BjrMP/ybv3zCw5wObFr327KfuWdUC6Lmmpp4TdM03Fs5jn8GH7L6OAFM3pbHMj6A2ZuJ5yIDbVwQ+HJX2vK"
+  },
+  {
+   "name": "曲红巍",
+   "tag": "辽宁",
+   "wrapped": "U2FsdGVkX1/soR6lHce7NnGEK6zMWAaGDUNj8T7N1Fa7B7IyLZ75wLnEKX9YeX80rI6+EyJYq/kdhBt3YzVn+ymOcLgbkfxyhvB6P6a2qGH1Ij82CezKIO3+T0OWSUOy"
+  },
+  {
+   "name": "王浩田",
+   "tag": "辽宁",
+   "wrapped": "U2FsdGVkX1+mb4X8VB8XK6Cxbo1VYA3fdZPOfRY32Z8patLMfxjMaU5+DECbhW/sk0vpRtwKowBg67uXQf1BwCRawYXoHje35fp+eF0n8o1w+JZmmOXMZ7g023sUIfNz"
+  },
+  {
+   "name": "付琨",
+   "tag": "辽宁",
+   "wrapped": "U2FsdGVkX1/+rIuQ3j1UNyXyyMfGsxKs7dLypwXDF1AJZ5rbtRQ1FcX69RAhdIVuC9ubEeXOHD8WgQHCf58Spuds3mzS6Zy1jsjjd0/ZiPI0LcV4BXiWqxce8NkZ+oBO"
+  },
+  {
+   "name": "邹奇",
+   "tag": "辽宁",
+   "wrapped": "U2FsdGVkX196NGYcJTsle8jorhLsl7attuTc5O01J9JsS1cnz+yC8z36E+obMMCLvZTG9C7NRaN4rj3GvYehaUWQ7emNkTFbQxtZjQPCW2fQCb47GywSPwXRZyOiFRTG"
+  },
+  {
+   "name": "王锦瑜",
+   "tag": "陕西",
+   "wrapped": "U2FsdGVkX194hC/iXhBxxztgSwXp9jIhLy8CMdJnuKoBxnwdro1m66cf3/HA4nn+/bbizI5vsPK0liZ3AAhhFDI1ShQugNscmwrK4vIek6WI9PxQLc/s3k1mXrgSD4OH"
+  },
+  {
+   "name": "刘昊鑫",
+   "tag": "陕西",
+   "wrapped": "U2FsdGVkX18cApHPFqfJ/JZagrZOYksjJdEj/WDbeASLi2CsSjwxduyNoxckjZNXWc0W7U/hXF93khD9vr0AeoBubfKHFsAnqd1ggdI3CoYA6r6+gyuXjytNN7JzuZ4s"
+  },
+  {
+   "name": "张恒",
+   "tag": "陕西",
+   "wrapped": "U2FsdGVkX18pK2wCReKGrzozezxl1e5zHwX2aukcO9bUBT049soD46yEqUQ3Yk2IE2V+cUIboWTmyUTVX0hChXSxyel6YAcTUqszECYSFKqTTPZeiasinmjsURRH97Kf"
+  },
+  {
+   "name": "杜宇翔",
+   "tag": "陕西",
+   "wrapped": "U2FsdGVkX1++lAoV+/NVzBWx4kWBjhAKK9BzTsVS1taqCRCVN471jLzNIIoAVJhwPaXmiqgCzApiB9ueq558pOJv1xL39PzTE+DSfiLKqmu9IPNCF4yfNi8+OqalVAJE"
+  },
+  {
+   "name": "段景译",
+   "tag": "陕西",
+   "wrapped": "U2FsdGVkX1+wkNEWvUkmVqSDrfsjutUbUlLRxjcfjhvYJc9MHQAXo8UX0vP2PHFrlF/lXDjzA+uw9845utte6rjxcV4pvqS/w7oGyRawWl+IijMQqwD4FOEPB1ADaQWV"
+  }
+ ]
+}

@@ -226,6 +226,8 @@ async function refresh(){
     ansBox.classList.remove("hidden");
   }else{
     entries = DATA.entries.filter(e=> !curCat || e.category===curCat);
+    // 按 ts 倒序：新上传/更新的条目排在最前面（ISO 字符串可直接字典序比较）
+    entries = entries.slice().sort((a,b)=> String(b.ts||"").localeCompare(String(a.ts||"")));
     $("#answer").classList.add("hidden");
   }
   renderList(entries);
